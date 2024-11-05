@@ -56,7 +56,8 @@ class QuizInterface:
         else:
             self.canvas.itemconfig(self.question_text,text="You'he reached the end of the quiz.")
             self.true_button.config(state="disabled")
-            self.wrong_button.config(state="")
+            self.wrong_button.config(state="disabled")
+            
     def true_pressed(self):
         is_right = self.quiz.check_answer("True")
         self.color_change(is_right)
