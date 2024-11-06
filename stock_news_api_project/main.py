@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 api_key = os.getenv("API_KEY")
+news_api_key = os.getenv("NEWS_API_KEY")
 
 STOCK_NAME = "TSLA"
 COMPANY_NAME = "Tesla Inc"
@@ -47,16 +48,22 @@ print(diffrence)
 diffrence_percentage = (diffrence/float(yesterday_close_price)) *  100
 print(diffrence_percentage)
 
-#If TODO4 percentage is greater than 5 then print("Get News").
-if diffrence_percentage > 5:
-    print("Get news")
+#If percentage is greater than 5 then print("Get News").
+#Instead of printing ("Get News"), use the News API to get articles related to the COMPANY_NAME.
+if diffrence_percentage > 1:
+    news_params = {
+        "apiKey" : news_api_key,
+        "qInTitle" : COMPANY_NAME,
+        
+    }
+    response = requests.get(NEWS_ENDPOINT,params=news_params)
+    response.raise_for_status()
+    data = response.json()["articles"]
+    # print(data)
+#Use Python slice operator to create a list that contains the first 3 articles. Hint: https://stackoverflow.com/questions/509211/understanding-slice-notation
+    first_three_articles = data[:3]
+    print(first_three_articles)
 
-    ## STEP 2: https://newsapi.org/ 
-    # Instead of printing ("Get News"), actually get the first 3 news pieces for the COMPANY_NAME. 
-
-#TODO 6. - Instead of printing ("Get News"), use the News API to get articles related to the COMPANY_NAME.
-
-#TODO 7. - Use Python slice operator to create a list that contains the first 3 articles. Hint: https://stackoverflow.com/questions/509211/understanding-slice-notation
 
 
     ## STEP 3: Use twilio.com/docs/sms/quickstart/python
