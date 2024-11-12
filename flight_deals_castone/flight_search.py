@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 import requests
+from datetime import datetime
 
 # load env variables 
 load_dotenv()
@@ -49,20 +50,43 @@ class FlightSearch:
         
         # print(f"Status code {response.status_code}. Airport IATA: {response.text}")
         try:
-            city_data = response.json()["data"]
-            if city_data:
-                # Return the first valid IATA code, or the first airport code if available
-                for city in city_data:
-                    if 'iataCode' in city and city['iataCode']:
-                        return city['iataCode']
-                return city_data[0].get('iataCode', 'N/A')  # Fallback if no code is found
-            else:
-                print(f"No city data found for {city_name}.")
-                return 'N/A'
-        except (IndexError, KeyError):
-            print(f"Error: No IATA code found for {city_name}.")
-            return 'Not Found'
+            code = response.json()["data"][0]['iataCode']
+        except IndexError:
+            print(f"IndexError: No airport code found for {city_name}.")
+            return "N/A"
+        except KeyError:
+            print(f"KeyError: No airport code found for {city_name}.")
+            return "Not Found"
+        
+    def check_flights(self, origin_city_code, destination_city_code, from_time, to_time):
+        headers = {"Authorization": f"Bearer {self.token}"}
+        query = {
+            "originLocationCode": origin_city_code,
+            "destinationLocationCode": destination_city_code,
+            "departureDate": from_time.strftime("%Y-%m-%d"),
+            "returnDate": to_time.strftime("%Y-%m-%d"),
+            "adults": 1,
+            "nonStop": "true",
+            "currencyCode": "GBP",
+            "max": "10",
+        }
 
+        response = requests.get(
+            url=FLIGHT_ENDPOINT,
+            headers=headers,
+            params=query,
+        )
+
+        if response.status_code != 200:
+            print(f"check_flights() response code: {response.status_code}")
+            print("There was a problem with the flight search.\n"
+                  "For details on status codes, check the API documentation:\n"
+                  "https://developers.amadeus.com/self-service/category/flights/api-doc/flight-offers-search/api"
+                  "-reference")
+            print("Response body:", response.text)
+            return None
+
+        return response.json()
 
     
 # run the flight search class

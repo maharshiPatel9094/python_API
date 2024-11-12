@@ -23,7 +23,7 @@ class DataManager:
         return self.SheetData
     
     def update_destination_codes(self):
-        for city in self.destination_data:
+        for city in self.SheetData:
             new_data = {
                 "price": {
                     "iataCode": city["iataCode"]
